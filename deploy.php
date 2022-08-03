@@ -37,7 +37,6 @@ task('deploy', [
     'deploy:prepare',
     'deploy:lock',
     'deploy:release',
-    'rsync',
     'deploy:secrets',
     'deploy:shared',
     'deploy:vendors',
