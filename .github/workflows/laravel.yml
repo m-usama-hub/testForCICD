@@ -35,4 +35,4 @@ jobs:
     - name: Deploy to Production
       env:
         DOT_ENV: ${{ secrets.DOT_ENV_STAGING }}
-      run: php vendor/bin/dep deploy prod --branch="main" -vv
+      run: php vendor/bin/dep deploy --branch="main" -vv
