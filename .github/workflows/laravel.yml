@@ -26,18 +26,46 @@ jobs:
       run: chmod -R 777 storage bootstrap/cache
     - name: Config cache
       run: php artisan config:cache
-  build-js-staging:
-    name: Build JavaScript/CSS for STAGING Server
+  # build-js-staging:
+  #   name: Build JavaScript/CSS for STAGING Server
+  #   runs-on: ubuntu-latest
+  #   needs: laravel-tests
+  #   steps:
+  #     - uses: actions/checkout@v3
+  #     - name: NPM Build
+  #       run: |
+  #         npm install
+  #         npm run dev
+  #     - name: Put built assets in Artifacts
+  #       uses: actions/upload-artifact@v3
+  #       with:
+  #         name: assets
+  #         path: public
+  deploy-staging:
+    name: Deploy Project to STAGING Server
     runs-on: ubuntu-latest
     needs: laravel-tests
+    # needs: [build-js-staging, laravel-tests]
     steps:
-      - uses: actions/checkout@v3
-      - name: NPM Build
-        run: |
-          npm install
-          npm run dev
-      - name: Put built assets in Artifacts
-        uses: actions/upload-artifact@v3
+      # - uses: actions/checkout@v3
+      # - name: Fetch built assets from Artifacts
+      #   uses: actions/download-artifact@v3
+      #   with:
+      #     name: assets
+      #     path: public
+      - name: Setup PHP
+        uses: shivammathur/setup-php@15c43e89cdef867065b0213be354c2841860869e
         with:
-          name: assets
-          path: public
+          php-version: 8.0
+          extension-csv: mbstring, bcmath
+      - name: Composer install
+        run: composer install -q --no-ansi --no-interaction --no-scripts --no-suggest --no-progress --prefer-dist
+      - name: Setup Deployer
+        uses: atymic/deployer-php-action@master
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+          ssh-known-hosts: ${{ secrets.SSH_KNOWN_HOSTS }}
+      - name: Deploy to Prod
+        env:
+          DOT_ENV: ${{ secrets.DOT_ENV_STAGING }}
+        run: dep deploy staging --tag=${{ env.GITHUB_REF }} -vvv
