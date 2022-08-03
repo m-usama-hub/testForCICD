@@ -2,13 +2,28 @@
 namespace Deployer;
 
 require 'recipe/laravel.php';
+require 'contrib/npm.php';
+require 'contrib/rsync.php';
 
 set('application', 'test for CICD');
 set('ssh_multiplexing', true);
-
-// Config
-
 set('repository', 'https://github.com/m-usama-hub/testForCICD.git');
+
+set('rsync_src', function () {
+    return __DIR__; // If your project isn't in the root, you'll need to change this.
+});
+
+add('rsync', [
+    'exclude' => [
+        '.git',
+        '/.env',
+        '/storage/',
+        '/vendor/',
+        '/node_modules/',
+        '.github',
+        'deploy.php',
+    ],
+]);
 
 add('shared_files', []);
 add('shared_dirs', []);
@@ -29,28 +44,26 @@ task('deploy:secrets', function () {
 host('dev74.onlinetestingserver.com')
     ->set('hostname','169.47.198.147')
     ->set('remote_user', 'dev74')
-    ->set('deploy_path', '~/www/testForCICD');
+    ->set('branch', 'main')
+    ->set('deploy_path', '~/public_html/testForCICD');
 
 // Hooks
 
 after('deploy:failed', 'deploy:unlock');
 
-desc('Deploy the application');
-
+desc('================================================================');
+desc('Start of Deploy the application');
 task('deploy', [
-    'deploy:info',
     'deploy:prepare',
-    'deploy:lock',
-    'deploy:release',
-    'deploy:secrets',
-    'deploy:shared',
+    'rsync',                // Deploy code & built assets
+    'deploy:secrets',       // Deploy secrets
     'deploy:vendors',
-    'deploy:writable',
-    'artisan:storage:link',
-    'artisan:view:cache',
-    'artisan:config:cache',
-    // 'artisan:migrate',
-    'artisan:queue:restart',
-    'deploy:symlink',
-    'deploy:unlock',
+    'deploy:shared',        //
+    'artisan:storage:link', //
+    'artisan:view:cache',   //
+    'artisan:config:cache', // Laravel specific steps
+    'artisan:migrate',      //
+    'artisan:queue:restart',//
+    'deploy:publish',       //
 ]);
+desc('End of Deploy the application');
