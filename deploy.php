@@ -22,7 +22,7 @@ task('deploy:secrets', function () {
 // Hosts
 
 host('custom-dev.onlinetestingserver.com')
-    ->hostname('45.63.58.248')
+    ->set('hostname','45.63.58.248')
     ->set('remote_user', 'deployer')
     ->set('deploy_path', '~/www/testForCICD');
 
