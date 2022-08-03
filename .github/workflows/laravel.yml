@@ -32,8 +32,5 @@ jobs:
       with:
         private-key: ${{ secrets.SSH_PRIVATE_KEY_CUSTOMDEV }}
         known-hosts: ${{ secrets.SSH_KNOWN_HOSTS_CUSTOMDEV }}
-    - name: Deploy to Prod
-      env:
-        DOT_ENV: ${{ secrets.DOT_ENV_STAGING }}
-      run: dep deploy -vvv
+        dep: deploy
 

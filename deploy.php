@@ -14,10 +14,10 @@ add('shared_files', []);
 add('shared_dirs', []);
 add('writable_dirs', []);
 
-task('deploy:secrets', function () {
-    file_put_contents(__DIR__ . '/.env', getenv('DOT_ENV'));
-    upload('.env', get('deploy_path') . '/shared');
-});
+// task('deploy:secrets', function () {
+//     file_put_contents(__DIR__ . '/.env', getenv('DOT_ENV'));
+//     upload('.env', get('deploy_path') . '/shared');
+// });
 
 // Hosts
 
