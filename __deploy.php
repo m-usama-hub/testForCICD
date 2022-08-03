@@ -1,32 +1,46 @@
 <?php
+
 namespace Deployer;
 
 require 'recipe/laravel.php';
+require 'recipe/rsync.php';
 
 set('application', 'test for CICD');
 set('ssh_multiplexing', true);
 
-// Config
+set('rsync_src', function () {
+    return __DIR__;
+});
 
-set('repository', 'https://github.com/m-usama-hub/testForCICD.git');
 
-add('shared_files', []);
-add('shared_dirs', []);
-add('writable_dirs', []);
+add('rsync', [
+    'exclude' => [
+        '.git',
+        '/.env',
+        '/storage/',
+        '/vendor/',
+        '/node_modules/',
+        '.github',
+        'deploy.php',
+    ],
+]);
 
 task('deploy:secrets', function () {
     file_put_contents(__DIR__ . '/.env', getenv('DOT_ENV'));
     upload('.env', get('deploy_path') . '/shared');
 });
 
-// Hosts
+// host('myapp.io')
+//   ->hostname('104.248.172.220')
+//   ->stage('production')
+//   ->user('root')
+//   ->set('deploy_path', '/var/www/my-app');
 
-host('custom-dev.onlinetestingserver.com')
-    ->hostname('45.63.58.248')
-    ->set('remote_user', 'deployer')
-    ->set('deploy_path', '~/www/testForCICD');
-
-// Hooks
+host('dev74.onlinetestingserver.com')
+  ->hostname('169.47.198.147')
+  ->stage('staging')
+  ->user('dev74')
+  ->set('deploy_path', '/public_html/testforcicd');
 
 after('deploy:failed', 'deploy:unlock');
 
